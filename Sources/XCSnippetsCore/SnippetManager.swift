@@ -5,10 +5,15 @@ public class SnippetManager {
     
     private let xcodeSnippetsPath = "/Library/Developer/Xcode/UserData/CodeSnippets"
     private let tempDirName = "TEMP_SNIPPETS"
+    private let snippetExtension = "codesnippet"
     
     private let fileManager = FileManager.default
     
     private let arguments: [String]
+    
+    private var snippetDir: URL {
+        return fileManager.homeDirectoryForCurrentUser.appendingPathComponent(xcodeSnippetsPath)
+    }
     
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
@@ -16,18 +21,40 @@ public class SnippetManager {
     
     public func run() throws {
         guard arguments.count > 1 else {
+            printHelp()
             throw Error.incorrectArguments
         }
         
-        guard let options = optionsFor(flags: arguments[1]) else {
+        let optionsString = arguments[1...].reduce("") { (res, next) -> String in
+            if (next.first == "-") { return res + next.trimmingCharacters(in: ["-"])}
+            else { return res }
+        }
+
+        guard let options = optionsFor(flags: optionsString) else {
             throw Error.incorrectArguments
         }
         
-        let repoIndex = options.isEmpty ? 1 : 2
-        let gitRepo = getRepoForArgument(arg: arguments[repoIndex])
+        if options.contains(.help) {
+            printHelp()
+            return
+        }
         
-        let snippetDir = fileManager.homeDirectoryForCurrentUser.appendingPathComponent(xcodeSnippetsPath)
+        if options.contains(.name) {
+            try nameSnippets()
+        }
         
+        if let repoString = arguments[1...].last(where: { !$0.contains("-")}) {
+            let repo = getRepoForArgument(arg: repoString)
+            try getSnippets(from: repo, with: options)
+            return
+        }
+        
+        if options.isEmpty {
+            printHelp()
+        }
+    }
+    
+    private func getSnippets(from repo: String, with options: [Option]) throws {
         var tempDir = URL(fileURLWithPath: "")
         do {
             tempDir = try prepareTempDir()
@@ -39,8 +66,8 @@ public class SnippetManager {
             printLine("Cleaning Up")
             try? fileManager.removeItem(at: tempDir)
         }
-        printLine("Getting Snippets from \(gitRepo)")
-        let clone = Shell.execute("git", "clone", gitRepo, tempDir.path)
+        printLine("Getting Snippets from \(repo)")
+        let clone = Shell.execute("git", "clone", repo, tempDir.path)
         if clone.status != 0 {
             try fileManager.removeItem(at: tempDir)
             throw Error.repoNotFound
@@ -49,7 +76,7 @@ public class SnippetManager {
         do {
             let files = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
             let snippets = files.filter { (file) -> Bool in
-                return file.pathExtension == "codesnippet"
+                return file.pathExtension == snippetExtension
             }
             
             for snippet in snippets {
@@ -66,6 +93,30 @@ public class SnippetManager {
         } catch {
             throw Error.fileSystemFailure
         }
+        printLine("Restart XCode to apply changes")
+    }
+    
+    private func nameSnippets() throws {
+        printLine("Named snippets")
+        
+        for file in try fileManager.contentsOfDirectory(at: snippetDir, includingPropertiesForKeys: nil) {
+            let parser = SnippetParser(file: file)
+            let snippet = parser.snippet
+            if snippet.title != "" && snippet.id == file.deletingPathExtension().lastPathComponent {
+                let name = snippet.title.split(separator: " ").reduce("", { $0 + $1.capitalized })
+                let originPath = file
+                let destinationPath = file.deletingLastPathComponent().appendingPathComponent(name).appendingPathExtension(snippetExtension)
+               try FileManager.default.moveItem(at: originPath, to: destinationPath)
+            }
+        }
+    }
+    
+    private func printHelp() {
+        printLine("HELP")
+        print("xcsnippets [-hnr] [repo]\n")
+        print("-h   Help\n")
+        print("-n   Name the snippets currently in the user data\n")
+        print("-r   Replace existing snippets with the same name\n")
     }
     
     private func prepareTempDir() throws -> URL  {
@@ -90,8 +141,7 @@ public class SnippetManager {
     
     private func optionsFor(flags: String) -> [Option]? {
         var options: [Option] = []
-        if !flags.contains("-") { return [] }
-        for item in flags.filter({ $0 != "-" }) {
+        for item in flags {
             if let option = Option(rawValue: item){
                 options.append(option)
             } else {
@@ -102,7 +152,7 @@ public class SnippetManager {
     }
     
     private func printLine(_ text: String) {
-        print("~~~~~~~~~~\(text)")
+        print("--------------------\(text)")
     }
 }
 
@@ -119,5 +169,8 @@ public extension SnippetManager {
 public extension SnippetManager {
     enum Option: Character {
         case replace = "r"
+        case help = "h"
+        case name = "n"
     }
 }
+
