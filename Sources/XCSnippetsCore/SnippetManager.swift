@@ -15,8 +15,6 @@ public class SnippetManager {
     }
     
     public func run() throws {
-        
-        print(arguments)
         guard arguments.count > 1 else {
             throw Error.incorrectArguments
         }
@@ -38,14 +36,16 @@ public class SnippetManager {
         }
         
         defer {
+            printLine("Cleaning Up\(gitRepo)")
             try? fileManager.removeItem(at: tempDir)
         }
-        
+        printLine("Getting Snippets from \(gitRepo)")
         let clone = Shell.execute("git", "clone", gitRepo, tempDir.path)
         if clone.status != 0 {
             try fileManager.removeItem(at: tempDir)
             throw Error.repoNotFound
         }
+        printLine("Moving Snippets to XCode User Data")
         do {
             let files = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
             let snippets = files.filter { (file) -> Bool in
@@ -99,6 +99,10 @@ public class SnippetManager {
             }
         }
         return options
+    }
+    
+    private func printLine(_ text: String) {
+        print("__________\(text)__________")
     }
 }
 
