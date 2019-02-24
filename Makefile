@@ -1,5 +1,5 @@
 prefix ?= /usr/local
-bindir = $(prefix)/bin
+bindir = $(prefix)/bin/
 
 build:
 	swift build -c release -Xswiftc -static-stdlib --disable-sandbox
