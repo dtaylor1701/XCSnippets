@@ -5,10 +5,10 @@ build:
 	swift build -c release -Xswiftc -static-stdlib --disable-sandbox
 
 install: build
-	install ".build/release/XCSnippets" "$(bindir)"
+	install ".build/release/xcsnippets" "$(bindir)"
 
 uninstall:
-	rm -rf "$(bindir)/XCSnippets"
+	rm -rf "$(bindir)/xcsnippets"
 
 clean:
 	rm -rf .build
