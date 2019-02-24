@@ -36,7 +36,7 @@ public class SnippetManager {
         }
         
         defer {
-            printLine("Cleaning Up\(gitRepo)")
+            printLine("Cleaning Up")
             try? fileManager.removeItem(at: tempDir)
         }
         printLine("Getting Snippets from \(gitRepo)")
@@ -102,7 +102,7 @@ public class SnippetManager {
     }
     
     private func printLine(_ text: String) {
-        print("__________\(text)__________")
+        print("~~~~~~~~~~\(text)")
     }
 }
 
