@@ -3,7 +3,7 @@ import Foundation
 @available(OSX 10.12, *)
 public class SnippetManager {
     
-    private let xcodeSnippetsPath = "/Library/Developer/Xcode/UserData/CodeSnippets"
+    private let xcodeSnippetsPath = "Library/Developer/Xcode/UserData/CodeSnippets"
     private let tempDirName = "TEMP_SNIPPETS"
     private let snippetExtension = "codesnippet"
     
@@ -26,7 +26,7 @@ public class SnippetManager {
         }
         
         let optionsString = arguments[1...].reduce("") { (res, next) -> String in
-            if (next.first == "-") { return res + next.trimmingCharacters(in: ["-"])}
+            if (next.first == "-") { return res + next.trimmingCharacters(in: ["-"]) }
             else { return res }
         }
 
@@ -39,11 +39,19 @@ public class SnippetManager {
             return
         }
         
+        if !fileManager.fileExists(atPath: snippetDir.path) {
+            do {
+               try fileManager.createDirectory(at: snippetDir, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                throw Error.fileSystemFailure
+            }
+        }
+        
         if options.contains(.name) {
             try nameSnippets()
         }
         
-        if let repoString = arguments[1...].last(where: { !$0.contains("-")}) {
+        if let repoString = arguments[1...].last(where: { $0.first != "-" }) {
             let repo = getRepoForArgument(arg: repoString)
             try getSnippets(from: repo, with: options)
             return
@@ -117,6 +125,7 @@ public class SnippetManager {
         print("-h   Help\n")
         print("-n   Name the snippets currently in the user data\n")
         print("-r   Replace existing snippets with the same name\n")
+        print("\n Snippets are stored in \(snippetDir.path)\n")
     }
     
     private func prepareTempDir() throws -> URL  {
@@ -152,7 +161,7 @@ public class SnippetManager {
     }
     
     private func printLine(_ text: String) {
-        print("--------------------\(text)")
+        print("----------\(text)")
     }
 }
 
