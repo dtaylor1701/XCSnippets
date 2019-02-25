@@ -6,8 +6,8 @@ build:
 	swift build -c release -Xswiftc -static-stdlib --disable-sandbox
 
 install: build
-	install ".build/release/xcsnippets" "$(bindir)"
-	install "xcsnippets.1" "$(mandir)"
+	mkdir -p "$(bindir)" && install ".build/release/xcsnippets" "$(bindir)"
+	mkdir -p "$(mandir)" && install "xcsnippets.1" "$(mandir)"
 
 uninstall:
 	rm -rf "$(bindir)xcsnippets"
