@@ -105,18 +105,23 @@ public class SnippetManager {
     }
     
     private func nameSnippets() throws {
-        printLine("Named snippets")
-        
         for file in try fileManager.contentsOfDirectory(at: snippetDir, includingPropertiesForKeys: nil) {
             let parser = SnippetParser(file: file)
             let snippet = parser.snippet
+
             if snippet.title != "" && snippet.id == file.deletingPathExtension().lastPathComponent {
                 let name = snippet.title.split(separator: " ").reduce("", { $0 + $1.capitalized })
                 let originPath = file
-                let destinationPath = file.deletingLastPathComponent().appendingPathComponent(name).appendingPathExtension(snippetExtension)
-               try FileManager.default.moveItem(at: originPath, to: destinationPath)
+                var destinationPath = file.deletingLastPathComponent().appendingPathComponent(name).appendingPathExtension(snippetExtension)
+                var suffix = 1
+                while fileManager.fileExists(atPath: destinationPath.path) {
+                    destinationPath = file.deletingLastPathComponent().appendingPathComponent(name + "\(suffix)").appendingPathExtension(snippetExtension)
+                    suffix = suffix + 1
+                }
+                try fileManager.moveItem(at: originPath, to: destinationPath)
             }
         }
+        printLine("Named snippets")
     }
     
     private func printHelp() {
