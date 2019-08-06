@@ -3,7 +3,7 @@ bindir = $(prefix)/bin/
 mandir = $(prefix)/share/man/man1/
 
 build:
-	swift build -c release -Xswiftc -static-stdlib --disable-sandbox
+	swift build -c release --disable-sandbox
 
 install: build
 	mkdir -p "$(bindir)" && install ".build/release/xcsnippets" "$(bindir)"
