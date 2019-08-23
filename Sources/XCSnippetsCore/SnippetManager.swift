@@ -38,6 +38,11 @@ public class SnippetManager {
             printHelp()
             return
         }
+
+        if options.contains(.list) {
+            printList()
+            return
+        }
         
         if !fileManager.fileExists(atPath: snippetDir.path) {
             do {
@@ -80,7 +85,7 @@ public class SnippetManager {
             try fileManager.removeItem(at: tempDir)
             throw Error.repoNotFound
         }
-        printLine("Moving Snippets to XCode User Data")
+        printLine("Moving Snippets to Xcode User Data")
         do {
             let files = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
             let snippets = files.filter { (file) -> Bool in
@@ -101,7 +106,7 @@ public class SnippetManager {
         } catch {
             throw Error.fileSystemFailure
         }
-        printLine("Restart XCode to apply changes")
+        printLine("Restart Xcode to apply changes")
     }
     
     private func nameSnippets() throws {
@@ -168,9 +173,15 @@ public class SnippetManager {
     private func printLine(_ text: String) {
         print("----------\(text)")
     }
+
+    private func printList() {
+        let session = URLSession.shared
+        let url = URL(string: "https://dtaylor1701.github.io/XCSnippets/Collections/main.json")!
+
+    }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.14, *)
 public extension SnippetManager {
     enum Error: Swift.Error {
         case incorrectArguments
@@ -179,12 +190,13 @@ public extension SnippetManager {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.14, *)
 public extension SnippetManager {
     enum Option: Character {
         case replace = "r"
         case help = "h"
         case name = "n"
+        case list = "l"
     }
 }
 

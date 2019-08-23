@@ -1,6 +1,6 @@
 import XCSnippetsCore
 
-if #available(OSX 10.12, *) {
+if #available(OSX 10.14, *) {
     let manager = SnippetManager()
     
     do {
@@ -9,7 +9,7 @@ if #available(OSX 10.12, *) {
         print("Hmm, something went wrong: \(error)")
     }
 } else {
-    print("macOS 10.12 or above is required.")
+    print("macOS 10.14 or above is required.")
 }
 
 
