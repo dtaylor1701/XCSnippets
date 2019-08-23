@@ -8,7 +8,7 @@ final class XCSnippetsTests: XCTestCase {
         // results.
 
         // Some of the APIs that we use below are available in macOS 10.13 and above.
-        guard #available(macOS 10.13, *) else {
+        guard #available(macOS 10.14, *) else {
             return
         }
 
