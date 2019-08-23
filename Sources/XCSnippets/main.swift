@@ -1,7 +1,7 @@
 import XCSnippetsCore
 
 if #available(OSX 10.14, *) {
-    let manager = SnippetManager(arguments: ["","-l"])
+    let manager = SnippetManager()
     
     do {
         try manager.run()

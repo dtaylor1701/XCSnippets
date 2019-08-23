@@ -51,6 +51,11 @@ public class SnippetManager {
                 throw Error.fileSystemFailure
             }
         }
+
+        if options.contains(.open) {
+            Shell.execute("open", snippetDir.absoluteString)
+            return
+        }
         
         if options.contains(.name) {
             try nameSnippets()
@@ -131,10 +136,11 @@ public class SnippetManager {
     
     private func printHelp() {
         printLine("HELP")
-        print("xcsnippets [-hnr] [repo]\n")
-        print("-h   Help\n")
-        print("-n   Name the snippets currently in the user data\n")
-        print("-r   Replace existing snippets with the same name\n")
+        print("xcsnippets [-r] [repo]\n")
+        print("xcsnippets [-hnlo]\n")
+        for option in Option.allCases {
+            print("\(option.description)\n")
+        }
         print("\n Snippets are stored in \(snippetDir.path)\n")
     }
     
@@ -180,24 +186,18 @@ public class SnippetManager {
         let url = URL(string: "https://dtaylor1701.github.io/XCSnippets/Collections/main.json")!
         let task = session.dataTask(with: url) { (data, _, error) in
             if error == nil, let data = data, let list = try? JSONDecoder().decode([SnippetRepository].self, from: data) {
+                self.printLine("Available Snippets \n")
                 for item in list {
-                    self.printLine(item.display())
+                    print(item.display())
                 }
+                print("\n")
+            } else {
+                self.printLine("Could not access snippet repository list")
             }
             finished = true
         }
         task.resume()
         while !finished {}
-    }
-
-    struct SnippetRepository: Codable {
-        var title: String
-        var path: String
-
-        func display() -> String {
-            return "\(path): \(title)"
-        }
-
     }
 }
 
@@ -212,11 +212,27 @@ public extension SnippetManager {
 
 @available(OSX 10.14, *)
 public extension SnippetManager {
-    enum Option: Character {
+    enum Option: Character, CaseIterable {
         case replace = "r"
         case help = "h"
         case name = "n"
         case list = "l"
+        case open = "o"
+
+        var description: String {
+            switch self {
+            case .replace:
+                return "-r   Replace existing snippets with the same name"
+            case .help:
+                return "-h   Help"
+            case .name:
+                return "-n   Name the snippets currently in the user data"
+            case .list:
+                return "-l   List a sample of available snippet repositories"
+            case .open:
+                return "-o   Open the snippets folder"
+            }
+        }
     }
 }
 

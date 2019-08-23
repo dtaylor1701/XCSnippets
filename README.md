@@ -26,10 +26,20 @@ Use the -r flag to replace existing snippets of the same name. This is useful fo
 xcsnippets -r "https://github.com/dtaylor1701/XCUISnippets.git"
 ```
 
-The -n  option will use the title of each snippet to name any unnamed files in the xcode snippets folder.
+### Other Functions
+
+The `-n ` option will use the title of each snippet to name any unnamed files in the xcode snippets folder.
 ```
 xcsnippets -n
 ```
 
+To open the snippets folder, use `-o`
+```
+xcsnippets -0
+```
 
+A list of snippets is maintained [here](Collections/main.json). Take a look with `-l` Please open a PR if you'd like to add a repo!
+```
+xcsnippets -l
+```
 

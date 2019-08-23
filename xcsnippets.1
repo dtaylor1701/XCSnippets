@@ -1,8 +1,9 @@
-.TH xcsnippets 1 "24 February 2019" "v1.0.2"
+.TH xcsnippets 1 "24 February 2019" "v1.1.0"
 .SH NAME
 xcsnippets - XCode Snippets Manager
 .SH SYNOPSIS
-xcsnippets [-hnr] [repo]
+xcsnippets [-r] [repo]
+xcsnippets [-hlno]
 .SH DESCRIPTION
 Install XCode snippets from git repositories. All codesnippets in the root of the github repository given will be installed into the current user's xcode data.
 
@@ -13,6 +14,8 @@ The following options are available:
 -n   Name the users' snippet files based on their titles. This will only occur for files with their default id-based names.
 
 -r   New snippets will replace existing snippets with the same name.
+
+-l   List snippets from https://dtaylor1701.github.io/XCSnippets/Collections/main.json (Feel free to open a PR with suggested additions!)
 
 .SH EXAMPLES
 Get snippets from a github user's repo:
