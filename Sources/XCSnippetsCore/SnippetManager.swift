@@ -175,8 +175,28 @@ public class SnippetManager {
     }
 
     private func printList() {
+        var finished = false
         let session = URLSession.shared
         let url = URL(string: "https://dtaylor1701.github.io/XCSnippets/Collections/main.json")!
+        let task = session.dataTask(with: url) { (data, _, error) in
+            if error == nil, let data = data, let list = try? JSONDecoder().decode([SnippetRepository].self, from: data) {
+                for item in list {
+                    self.printLine(item.display())
+                }
+            }
+            finished = true
+        }
+        task.resume()
+        while !finished {}
+    }
+
+    struct SnippetRepository: Codable {
+        var title: String
+        var path: String
+
+        func display() -> String {
+            return "\(path): \(title)"
+        }
 
     }
 }
