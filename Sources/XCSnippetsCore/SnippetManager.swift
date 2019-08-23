@@ -136,7 +136,7 @@ public class SnippetManager {
     
     private func printHelp() {
         printLine("HELP")
-        print("xcsnippets [-r] [repo]\n")
+        print("xcsnippets [-r] [repo]")
         print("xcsnippets [-hnlo]\n")
         for option in Option.allCases {
             print("\(option.description)\n")
