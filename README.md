@@ -38,7 +38,7 @@ To open the snippets folder, use `-o`
 xcsnippets -0
 ```
 
-A list of snippets is maintained [here](Collections/main.json). Take a look with `-l` Please open a PR if you'd like to add a repo!
+A list of snippets is maintained [here](Collections/main.json). Take a look with `-l`. Please open a PR if you'd like to add a repo!
 ```
 xcsnippets -l
 ```
