@@ -181,7 +181,8 @@ public class SnippetManager {
     }
 
     private func printList() {
-        var finished = false
+        printLine("Getting snippet repository list")
+        let semaphore = DispatchSemaphore(value: 0)
         let session = URLSession.shared
         let url = URL(string: "https://dtaylor1701.github.io/XCSnippets/Collections/main.json")!
         let task = session.dataTask(with: url) { (data, _, error) in
@@ -194,10 +195,10 @@ public class SnippetManager {
             } else {
                 self.printLine("Could not access snippet repository list")
             }
-            finished = true
+            semaphore.signal()
         }
         task.resume()
-        while !finished {}
+        semaphore.wait()
     }
 }
 
