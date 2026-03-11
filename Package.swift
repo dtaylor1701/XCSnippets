@@ -25,6 +25,6 @@ let package = Package(
             name: "XCSnippetsCore"),
         .testTarget(
             name: "XCSnippetsTests",
-            dependencies: ["XCSnippets"]),
+            dependencies: ["XCSnippets", "XCSnippetsCore"]),
     ]
 )

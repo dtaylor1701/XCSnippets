@@ -2,7 +2,7 @@ import XCTest
 import class Foundation.Bundle
 
 final class XCSnippetsTests: XCTestCase {
-    func testExample() throws {
+    func testNoArgumentsShowHelp() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
@@ -24,9 +24,11 @@ final class XCSnippetsTests: XCTestCase {
         process.waitUntilExit()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
+        let output = String(data: data, encoding: .utf8) ?? ""
 
-        XCTAssertEqual(output, "Hello, world!\n")
+        XCTAssertTrue(output.contains("HELP"))
+        XCTAssertTrue(output.contains("xcsnippets [-r] [repo]"))
+        XCTAssertTrue(output.contains("incorrectArguments"))
     }
 
     /// Returns path to the built products directory.
@@ -41,7 +43,33 @@ final class XCSnippetsTests: XCTestCase {
       #endif
     }
 
+    func testHelpFlag() throws {
+        guard #available(macOS 10.14, *) else {
+            return
+        }
+
+        let fooBinary = productsDirectory.appendingPathComponent("XCSnippets")
+
+        let process = Process()
+        process.executableURL = fooBinary
+        process.arguments = ["-h"]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+
+        try process.run()
+        process.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8) ?? ""
+
+        XCTAssertTrue(output.contains("HELP"))
+        XCTAssertTrue(output.contains("xcsnippets [-r] [repo]"))
+        XCTAssertFalse(output.contains("incorrectArguments"))
+    }
+
     static var allTests = [
-        ("testExample", testExample),
+        ("testNoArgumentsShowHelp", testNoArgumentsShowHelp),
+        ("testHelpFlag", testHelpFlag),
     ]
 }
